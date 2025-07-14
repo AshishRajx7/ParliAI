@@ -1,5 +1,6 @@
 import os
 import sys
+os.environ["STREAMLIT_HOME"] = "/tmp"
 sys.path.append(os.path.join(os.path.dirname(__file__), "streamlit_app"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
