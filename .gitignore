@@ -5,3 +5,4 @@ openai_key.txt
 models/
 *.pkl
 .venv/
+memory/
