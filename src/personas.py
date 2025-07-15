@@ -2,7 +2,6 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 import random
 from typing import Dict
 
-# Templates for each persona's tone and reasoning
 PERSONA_TEMPLATES: Dict[str, str] = {
     "Lawyer": (
         "You are a professional lawyer. Respond with a legal and ethical analysis of "
@@ -21,8 +20,7 @@ PERSONA_TEMPLATES: Dict[str, str] = {
     ),
 }
 
-# Load the Mistral 7B instruct model
-model_id = "mistralai/Mistral-7B-Instruct-v0.2"
+model_id = "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
 tokenizer = AutoTokenizer.from_pretrained(model_id)
 model = AutoModelForCausalLM.from_pretrained(model_id, device_map="auto", trust_remote_code=True)
 chat = pipeline("text-generation", model=model, tokenizer=tokenizer)
@@ -55,5 +53,5 @@ def get_persona_response(persona: str, topic: str, use_mock: bool = False) -> st
     prompt = PERSONA_TEMPLATES[persona].format(input=topic)
     prompt = f"{prompt}\n\nRespond as the {persona}."
 
-    response = chat(prompt, max_new_tokens=300, do_sample=True, temperature=0.7)
+    response = chat(prompt, max_new_tokens=256, do_sample=True, temperature=0.7)
     return response[0]["generated_text"].replace(prompt, "").strip()
