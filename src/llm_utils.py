@@ -1,38 +1,28 @@
+# src/llm_utils.py
 import os
 from typing import Dict
-import openai
+from openai import OpenAI
 
-_OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-if _OPENAI_KEY is None:
+api_key = os.getenv("OPENAI_API_KEY")
+if api_key is None:
     try:
-        import streamlit as st  # imported only if running inside Streamlit
-        _OPENAI_KEY = st.secrets["OPENAI_API_KEY"]
+        import streamlit as st
+        api_key = st.secrets["OPENAI_API_KEY"]
     except Exception:
-        raise RuntimeError(
-            "OPENAI_API_KEY not found. "
-            "Set it as an environment variable or in .streamlit/secrets.toml"
-        )
+        raise RuntimeError("OPENAI_API_KEY not set.")
 
-openai.api_key = _OPENAI_KEY
-MODEL = "gpt-3.5-turbo"      # or gpt-4o, gpt-4o-mini, etc.
-
+client = OpenAI(api_key=api_key)
+MODEL = "gpt-3.5-turbo"
 
 def summarize_debate(responses: Dict[str, str]) -> str:
-    """
-    Combine persona responses into a concise summary verdict.
-    """
-    persona_block = "\n\n".join(
-        f"{name}: {text}" for name, text in responses.items()
-    )
+    persona_block = "\n\n".join(f"{p}: {r}" for p, r in responses.items())
     prompt = (
-        "You are an expert debate moderator. Produce a concise (≈150‑word) "
-        "summary verdict that captures the key points of agreement and disagreement, "
-        "then recommend a balanced course of action.\n\n"
-        f"Persona arguments:\n{persona_block}\n\n"
-        "Summary verdict:"
+        "You are an expert debate moderator. Produce a concise (~150‑word) "
+        "summary verdict that captures key arguments and suggests a balanced recommendation.\n\n"
+        f"{persona_block}\n\nSummary verdict:"
     )
 
-    completion = openai.ChatCompletion.create(
+    completion = client.chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.4,
