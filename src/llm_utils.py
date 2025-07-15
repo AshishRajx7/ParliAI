@@ -2,6 +2,7 @@
 import os
 from typing import Dict
 from openai import OpenAI
+from transformers import pipeline
 
 api_key = os.getenv("OPENAI_API_KEY")
 if api_key is None:
